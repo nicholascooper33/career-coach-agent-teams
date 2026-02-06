@@ -32,8 +32,8 @@ Ask a question like *"Should I leave my law firm to build a legal tech startup?"
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/career-coach.git
-cd career-coach
+git clone https://github.com/nicholascooper33/career-coach-agent-teams.git
+cd career-coach-agent-teams
 ```
 
 ### 2. Verify the file structure
@@ -41,14 +41,12 @@ cd career-coach
 After cloning, you should see:
 
 ```
-career-coach/
+career-coach-agent-teams/
 ├── CLAUDE.md                                        # Project config, token rules, panel guide
 ├── README.md                                        # This file
 ├── LICENSE                                          # MIT licence
 ├── .claude/
 │   ├── settings.json                                # Enables Agent Teams
-│   ├── commands/
-│   │   └── careercoach.md                           # /careercoach slash command
 │   └── skills/
 │       └── career-coaching/
 │           ├── SKILL.md                             # Trigger, workflow, synthesis format
@@ -78,7 +76,7 @@ export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
 ### 4. Launch Claude Code from the project directory
 
 ```bash
-cd career-coach
+cd career-coach-agent-teams
 claude
 ```
 
@@ -116,12 +114,13 @@ I have a non-linear career — law, then tech, then consulting. How do I make th
 
 1. **The lead agent** reads your question, consults the panel selection guide, and picks 3 personas that will produce genuine disagreement
 2. **Three teammates are spawned** (using Sonnet to manage token costs), each embodying a historical figure with a full personality, philosophical framework, and approach
-3. **Initial advice** — each teammate responds to your question in character (150 words max)
-4. **Debate round** — each teammate reads the others' positions and sends one challenge to the teammate they most disagree with (80 words max)
-5. **Final positions** — each teammate sends their revised view to the lead (100 words max), noting if the debate changed their thinking
-6. **Synthesis** — the lead weaves the perspectives together: headline insight, where they agreed, where they clashed, 2-3 concrete action items
-7. **Deep dive offer** — you're asked if you'd like to "pull aside" any figure for a longer 1-on-1 conversation
-8. **Team shutdown** — teammates are dismissed to stop burning tokens
+3. **Initial advice** — each teammate responds to your question in character (400 words max)
+4. **Debate rounds (×3)** — three rounds of challenge and rebuttal (250 words max each). Teammates can switch targets between rounds as positions evolve
+5. **Final positions** — each teammate sends their revised view to the lead (300 words max), noting how the debate changed their thinking
+6. **Full debate displayed** — the lead relays every teammate's initial advice, each debate exchange, and final positions to you so you can follow the full deliberation
+7. **Synthesis** — the lead weaves the perspectives together: headline insight, where they agreed, where they clashed, 2-3 concrete action items
+8. **Deep dive offer** — you're asked if you'd like to "pull aside" any figure for a longer 1-on-1 conversation
+9. **Team shutdown** — teammates are dismissed to stop burning tokens
 
 ### Go deeper with a single figure
 
@@ -162,8 +161,8 @@ Agent Teams are expensive. This project includes aggressive token management:
 
 - **3 teammates max** per question (not all 12)
 - **Sonnet for all teammates** (lead uses your session's model)
-- **Strict word limits**: 150 → 80 → 100 words across three rounds
-- **One debate round only** — no runaway back-and-forth
+- **Strict word limits**: 400 → 250 → 300 words across the workflow
+- **Three debate rounds** — enough depth for real engagement, capped to prevent runaway costs
 - **Direct messages only** — no `broadcast` (which multiplies cost by N)
 - **Immediate team shutdown** after synthesis
 - **Progressive disclosure** — the 12 persona prompts live in a reference file loaded only when needed, not always in context
@@ -203,17 +202,7 @@ The SKILL.md instructs the lead to "Use Sonnet for all teammates." You can chang
 
 ### Adjust word limits
 
-The word limits (150/80/100) in `CLAUDE.md` and `SKILL.md` balance quality against token cost. If you find responses too terse, increase to 250/120/150. If you want even leaner sessions, reduce to 100/50/75.
-
-### Slash command
-
-The project includes a `/careercoach` slash command at `.claude/commands/careercoach.md`. Use it for an explicit entry point:
-
-```
-/careercoach Should I take the promotion?
-```
-
-You can duplicate and rename this file to create variants — e.g. a `/quickcoach` that uses 2 teammates instead of 3, or a `/deepcoach` that allows a longer debate round.
+The word limits (400/250/300) in `CLAUDE.md` and `SKILL.md` balance quality against token cost. If you want leaner sessions, reduce to 150/80/100.
 
 ## Display Modes
 
@@ -232,7 +221,7 @@ Split panes are recommended for this project — watching the historical figures
 
 ### Skill doesn't trigger
 
-- Make sure you're running Claude Code **from the project directory** (`cd career-coach && claude`)
+- Make sure you're running Claude Code **from the project directory** (`cd career-coach-agent-teams && claude`)
 - Check that `.claude/skills/career-coaching/SKILL.md` exists and has valid YAML frontmatter
 - Try explicitly asking: *"Use the career-coaching skill to answer this question..."*
 
@@ -261,11 +250,11 @@ Rough estimates per career coaching session (3 Sonnet teammates + lead):
 | Phase | Tokens (approx.) |
 |---|---|
 | Teammate spawn (×3) | ~3,000 each (context loading) |
-| Initial advice (×3) | ~600 each |
-| Debate round (×3) | ~400 each |
-| Final positions (×3) | ~300 each |
-| Lead synthesis | ~1,500 |
-| **Total** | **~15,000–20,000** |
+| Initial advice (×3) | ~1,500 each |
+| Debate rounds (3 rounds × 3 teammates) | ~900 each |
+| Final positions (×3) | ~1,000 each |
+| Lead synthesis | ~2,000 |
+| **Total** | **~30,000–40,000** |
 
 This is a rough guide — actual usage varies with question complexity and model verbosity. A 1-on-1 deep dive adds roughly 5,000–8,000 tokens per exchange.
 
